@@ -1,0 +1,42 @@
+services:
+  database:
+    image: mysql
+    container_name: mysqldb
+    networks:
+      springnet:
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: sampledb
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+  spring:
+    depends_on:
+      - database
+    container_name: springproject
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/sampledb?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "root1234"
+    networks:
+      springnet:
+    ports:
+      - "8080:8080"
+    restart: always
+
+networks:
+  springnet:
+
+# intellij에서 gradle > build > bootJar 클릭해서 .jar 생성
+# 프로젝트 폴더 > build > libs > 안에 있는 .jar 파일을 이 폴더(sample04)에 넣기
+
+# docker run -d -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root1234 --name mydbserver mysql
+# docker ps 명령어 입력 후 CONTAINER ID 확인 -> 5b162aeaa2c7 
+# docker exec -it 5b162aeaa bash
+
+# mysql> create database sampledb;
+# mysql> use sampledb;
